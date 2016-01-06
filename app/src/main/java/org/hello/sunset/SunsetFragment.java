@@ -1,5 +1,6 @@
 package org.hello.sunset;
 
+import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.res.Resources;
@@ -57,18 +58,33 @@ public class SunsetFragment extends Fragment {
         float sunYStart = mSunView.getTop();
         float sunYEnd = mSkyView.getHeight();
 
+        // moves the sun
         ObjectAnimator heightAnimator = ObjectAnimator
                 .ofFloat(mSunView, "y", sunYStart, sunYEnd)
                 .setDuration(3000);
         heightAnimator.setInterpolator(new AccelerateInterpolator());
 
+        // changes the color of the sky
         ObjectAnimator sunsetSkyAnimator = ObjectAnimator
                 .ofInt(mSkyView, "backgroundColor", mBlueSkyColor, mSunsetSkyColor)
                 .setDuration(3000);
 
         sunsetSkyAnimator.setEvaluator(new ArgbEvaluator());
-        heightAnimator.start();
-        sunsetSkyAnimator.start();
+//        heightAnimator.start();
+//        sunsetSkyAnimator.start();
+
+        // changes the color of the sky after the sun has set
+        ObjectAnimator nightSkyAnimator = ObjectAnimator
+                .ofInt(mSkyView, "backgroundColor", mSunsetSkyColor, mNightSkyColor)
+                .setDuration(1500);
+        nightSkyAnimator.setEvaluator(new ArgbEvaluator());
+
+        // set an AnimatorSet to combine the animations
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(heightAnimator)
+                .with(sunsetSkyAnimator)
+                .before(nightSkyAnimator);
+        animatorSet.start();
     }
 
 }
